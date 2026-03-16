@@ -108,8 +108,8 @@ const AppSidebar = () => {
             <Image
               src="/logo.png"
               alt="Logo"
-              width={128}
-              height={128}
+              width={156}
+              height={156}
               className="h-full w-full object-contain group-data-[collapsible=icon]:h-14 group-data-[collapsible=icon]:w-14"
               unoptimized
               onError={(e) => {
@@ -120,7 +120,7 @@ const AppSidebar = () => {
               }}
             />
           </div>
-          
+
         </div>
       </SidebarHeader>
 
@@ -140,11 +140,10 @@ const AppSidebar = () => {
                   >
                     <Link
                       href={item.url}
-                      className={`flex items-center gap-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 md:gap-4 ${
-                        isActive(item.url)
+                      className={`flex items-center gap-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 md:gap-4 ${isActive(item.url)
                           ? "bg-sidebar-primary! text-sidebar-primary-foreground"
                           : "hover:bg-sidebar-primary hover:text-sidebar-primary-foreground"
-                      }`}
+                        }`}
                     >
                       <item.icon className="h-6 w-6 group-data-[collapsible=icon]:h-9 group-data-[collapsible=icon]:w-9 md:h-7 md:w-7" />
                       <span className="text-base font-medium md:text-lg">{item.title}</span>

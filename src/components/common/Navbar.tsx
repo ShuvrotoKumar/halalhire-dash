@@ -65,7 +65,7 @@ const Navbar = () => {
                   className="h-5 w-5 text-gray-900 md:h-6 md:w-6 dark:text-white"
                   strokeWidth={2}
                 />
-                <div className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 md:top-2 md:right-2 md:h-4 md:w-4">
+                <div className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-[#C8A75B] md:top-2 md:right-2 md:h-4 md:w-4">
                   <span className="text-xs font-normal text-white">.</span>
                 </div>
               </button>
