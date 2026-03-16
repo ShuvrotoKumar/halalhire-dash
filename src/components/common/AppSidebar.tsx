@@ -65,11 +65,11 @@ const items = [
   //   url: "/products",
   //   icon: PackageSearch,
   // },
-  {
-    title: "Subscription",
-    url: "/subscription",
-    icon: Podcast,
-  },
+  // {
+  //   title: "Subscription",
+  //   url: "/subscription",
+  //   icon: Podcast,
+  // },
   // {
   //   title: "Blog",
   //   url: "/blogs",
@@ -141,8 +141,8 @@ const AppSidebar = () => {
                     <Link
                       href={item.url}
                       className={`flex items-center gap-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 md:gap-4 ${isActive(item.url)
-                          ? "bg-sidebar-primary! text-sidebar-primary-foreground"
-                          : "hover:bg-sidebar-primary hover:text-sidebar-primary-foreground"
+                        ? "bg-sidebar-primary! text-sidebar-primary-foreground"
+                        : "hover:bg-sidebar-primary hover:text-sidebar-primary-foreground"
                         }`}
                     >
                       <item.icon className="h-6 w-6 group-data-[collapsible=icon]:h-9 group-data-[collapsible=icon]:w-9 md:h-7 md:w-7" />
