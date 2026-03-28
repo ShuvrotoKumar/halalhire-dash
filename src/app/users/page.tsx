@@ -313,14 +313,14 @@ export default function UsersPage() {
             onClick={() => setActiveTab("clients")}
             className="px-4 whitespace-nowrap sm:px-6"
           >
-            Clients
+            Users
           </Button>
           <Button
             variant={activeTab === "providers" ? "default" : "outline"}
             onClick={() => setActiveTab("providers")}
             className="px-4 whitespace-nowrap sm:px-6"
           >
-            Providers
+            Companies
           </Button>
         </div>
       </div>

@@ -46,14 +46,14 @@ const Navbar = () => {
           <div className="mr-2 flex shrink-0 items-center gap-1.5 pr-0 md:gap-3 md:pr-2">
 
             {/* Messages */}
-            <Link href="/chats" className="flex-shrink-0">
+            {/* <Link href="/chats" className="flex-shrink-0">
               <div className="flex h-[40px] w-[40px] cursor-pointer items-center justify-center rounded-full border border-gray-900 bg-transparent hover:bg-white/10 md:h-[52px] md:w-[52px] dark:border-white">
                 <MessageSquare
                   className="h-5 w-5 text-gray-900 md:h-6 md:w-6 dark:text-white"
                   strokeWidth={2}
                 />
               </div>
-            </Link>
+            </Link> */}
 
             {/* Notifications */}
             <div className="relative flex-shrink-0">
