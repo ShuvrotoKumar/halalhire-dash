@@ -4,12 +4,17 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { useLogInMutation } from "@/redux/api/authApi";
+import { setUser } from "@/redux/Slice/authSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const [logIn, { isLoading }] = useLogInMutation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +22,7 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
+    form?: string;
   }>({});
 
   const validateForm = () => {
@@ -38,13 +44,28 @@ export default function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // Add your login logic here
-      console.log("Login:", { email, password, rememberMe });
-      // Example: router.push('/');
+      try {
+        const response = await logIn({ email, password }).unwrap();
+        
+        // Adjust these based on actual API response structure
+        const userData = response?.data?.user || response?.user;
+        const accessToken = response?.data?.accessToken || response?.accessToken || response?.token;
+
+        if (accessToken) {
+          dispatch(setUser({ user: userData, token: accessToken }));
+          router.push("/");
+        } else {
+          setErrors({ ...errors, form: "Login successful but no token received." });
+        }
+      } catch (err: any) {
+        console.error("Login Error:", err);
+        const errorMessage = err?.data?.message || "Something went wrong. Please try again.";
+        setErrors({ ...errors, form: errorMessage });
+      }
     }
   };
 
@@ -146,13 +167,28 @@ export default function LoginPage() {
               </Link>
             </div>
 
+            {/* Form Level Error */}
+            {errors.form && (
+              <div className="bg-destructive/10 border-destructive/20 text-destructive rounded-lg border p-3 text-center text-sm">
+                {errors.form}
+              </div>
+            )}
+
             {/* Submit Button */}
             <Button
               type="submit"
               className="bg-primary hover:bg-primary/90 text-primary-foreground w-full text-base font-semibold"
               size="lg"
+              disabled={isLoading}
             >
-              Sign In
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Signing In...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
         </div>

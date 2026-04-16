@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/common/theme-provider";
 import NotificationProvider from "@/context/notification-context";
+import ReduxProvider from "@/redux/ReduxProvider";
 import DashboardLayout from "@/app/DashboardLayout";
 
 const poppins = Poppins({
@@ -36,7 +37,9 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <NotificationProvider>
-            <DashboardLayout>{children}</DashboardLayout>
+            <ReduxProvider>
+              <DashboardLayout>{children}</DashboardLayout>
+            </ReduxProvider>
           </NotificationProvider>
         </ThemeProvider>
       </body>
