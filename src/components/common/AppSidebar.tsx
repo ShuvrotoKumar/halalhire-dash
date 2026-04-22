@@ -88,7 +88,7 @@ const items = [
 ];
 
 const AppSidebar = () => {
-  const { state } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const pathname = usePathname();
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
@@ -140,6 +140,7 @@ const AppSidebar = () => {
                   >
                     <Link
                       href={item.url}
+                      onClick={() => isMobile && setOpenMobile(false)}
                       className={`flex items-center gap-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 md:gap-4 ${isActive(item.url)
                         ? "bg-sidebar-primary! text-sidebar-primary-foreground"
                         : "hover:bg-sidebar-primary hover:text-sidebar-primary-foreground"
@@ -164,7 +165,10 @@ const AppSidebar = () => {
               className="h-12 border-2 border-red-600 text-base font-medium text-red-500 transition-colors hover:border-red-700 hover:bg-red-500 hover:text-white md:h-16 md:text-lg"
               onClick={() => setLogoutModalOpen(true)}
             >
-              <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 md:gap-4">
+              <div 
+                className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 md:gap-4"
+                onClick={() => isMobile && setOpenMobile(false)}
+              >
                 <LogOut className="h-6 w-6 group-data-[collapsible=icon]:h-9 group-data-[collapsible=icon]:w-9 md:h-7 md:w-7" />
                 <span className="text-base font-medium group-data-[collapsible=icon]:hidden md:text-lg">
                   Log Out
