@@ -124,50 +124,54 @@ const Earnings = () => {
     <div className="py-6">
       {/* stat */}
       <div
-        className="dark:bg-sidebar mb-4 flex w-full items-center justify-center rounded-lg border border-[#E2E8F0] bg-white shadow-sm max-md:py-4 dark:border-[#F4B057]"
+        className="dark:bg-sidebar mb-4 flex w-full flex-col items-center justify-center rounded-lg border border-[#E2E8F0] bg-white shadow-sm py-6 sm:flex-row sm:py-0 dark:border-[#F4B057]"
         style={{ minHeight: "110px" }}
       >
-        <div className="flex flex-1 flex-col items-center justify-center px-2">
-          <p className="ipad:text-3xl mb-2 text-2xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white">
+        <div className="flex flex-1 flex-col items-center justify-center px-2 py-4 sm:py-0">
+          <p className="ipad:text-3xl mb-1 text-xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white">
             <CountingNumber
               end={avgTransaction}
               duration={1000}
               decimals={2}
               prefix="$"
-              className="ipad:text-3xl mb-2 text-2xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white"
+              className="ipad:text-3xl text-xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white"
             />
           </p>
-          <span className="text-center text-sm font-medium text-[#0D2357] lg:text-lg dark:text-white">
+          <span className="text-center text-xs font-medium text-[#0D2357] lg:text-lg dark:text-white sm:text-sm">
             Average Transaction
           </span>
         </div>
-        <div className="mx-4 h-16 w-px bg-[#F4B057]" />
-        <div className="flex flex-1 flex-col items-center justify-center px-2">
-          <p className="ipad:text-3xl mb-2 text-2xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white">
+        <div className="mx-4 h-16 w-px bg-[#F4B057] hidden sm:block" />
+        <div className="my-2 h-px w-3/4 bg-[#F4B057]/30 block sm:hidden" />
+        
+        <div className="flex flex-1 flex-col items-center justify-center px-2 py-4 sm:py-0">
+          <p className="ipad:text-3xl mb-1 text-xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white">
             <CountingNumber
               end={currentMonthRevenue}
               duration={1000}
               decimals={2}
               prefix="$"
-              className="ipad:text-3xl mb-2 text-2xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white"
+              className="ipad:text-3xl text-xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white"
             />
           </p>
-          <span className="text-center text-sm font-medium text-[#0D2357] lg:text-lg dark:text-white">
+          <span className="text-center text-xs font-medium text-[#0D2357] lg:text-lg dark:text-white sm:text-sm">
             Current Month Revenue
           </span>
         </div>
-        <div className="mx-4 h-16 w-px bg-[#F4B057]" />
-        <div className="flex flex-1 flex-col items-center justify-center px-2">
-          <p className="ipad:text-3xl mb-2 text-2xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white">
+        <div className="mx-4 h-16 w-px bg-[#F4B057] hidden sm:block" />
+        <div className="my-2 h-px w-3/4 bg-[#F4B057]/30 block sm:hidden" />
+
+        <div className="flex flex-1 flex-col items-center justify-center px-2 py-4 sm:py-0">
+          <p className="ipad:text-3xl mb-1 text-xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white">
             <CountingNumber
               end={totalRevenue}
               duration={1000}
               decimals={2}
               prefix="$"
-              className="ipad:text-3xl mb-2 text-2xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white"
+              className="ipad:text-3xl text-xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white"
             />
           </p>
-          <span className="text-center text-sm font-medium text-[#0D2357] lg:text-lg dark:text-white">
+          <span className="text-center text-xs font-medium text-[#0D2357] lg:text-lg dark:text-white sm:text-sm">
             Total Revenue
           </span>
         </div>
@@ -209,7 +213,7 @@ const Earnings = () => {
             </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[800px]">
               <thead>
                 <tr className="border-b border-[#E2E8F0] dark:border-[#F4B057]">
                   <th className="pb-3 text-left text-sm font-medium text-[#0D2357] dark:text-white">

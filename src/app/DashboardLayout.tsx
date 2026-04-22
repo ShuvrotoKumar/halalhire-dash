@@ -35,7 +35,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar />
-      <SidebarInset className="ml-5 px-5">
+      <SidebarInset className="md:ml-5 px-3 md:px-5">
         <Navbar />
         <div className="">{children}</div>
       </SidebarInset>

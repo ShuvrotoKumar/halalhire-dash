@@ -18,7 +18,7 @@ const Navbar = () => {
 
       {/* Main navbar */}
       <div
-        className={`bg-sidebar fixed top-3 right-0 z-40 mx-2 h-[68px] rounded-lg rounded-t-none shadow-md transition-all duration-300 md:top-5 md:mx-5 md:h-[84px] ${sidebarOpen ? "md:left-77" : "md:left-22"}`}
+        className={`bg-sidebar fixed top-3 left-2 right-2 z-40 h-[68px] rounded-lg rounded-t-none shadow-md transition-all duration-300 md:top-5 md:mx-5 md:h-[84px] ${sidebarOpen ? "md:left-77" : "md:left-22"}`}
       >
         <div className="ml-2 flex h-full w-full items-center justify-between px-2 md:ml-5 md:px-4">
           {/* Left Section */}
