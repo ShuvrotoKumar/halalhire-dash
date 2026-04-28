@@ -25,7 +25,31 @@ const privacyApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["privacy"],
     }),
+    createCookiePolicy: builder.mutation({
+      query: ({ requestData }) => ({
+        url: "/setting/cookie_policy",
+        method: "POST",
+        body: requestData,
+      }),
+      invalidatesTags: ["privacy"],
+    }),
+    createAccessibility: builder.mutation({
+      query: ({ requestData }) => ({
+        url: "/setting/accessibility",
+        method: "POST",
+        body: requestData,
+      }),
+      invalidatesTags: ["privacy"],
+    }),
+    createImprint: builder.mutation({
+      query: ({ requestData }) => ({
+        url: "/setting/imprint",
+        method: "POST",
+        body: requestData,
+      }),
+      invalidatesTags: ["privacy"],
+    }),
   }),
 });
 
-export const { useGetPrivacyQuery, useCreatePrivacyMutation, useCreateAboutUsMutation } = privacyApi;
+export const { useGetPrivacyQuery, useCreatePrivacyMutation, useCreateAboutUsMutation, useCreateCookiePolicyMutation, useCreateAccessibilityMutation, useCreateImprintMutation } = privacyApi;

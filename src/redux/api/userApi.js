@@ -4,7 +4,7 @@ export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllUser: builder.query({
       query: (params) => ({
-        url: "dashboard/get-all-user",
+        url: "/user/find_by_user_growth",
         method: "GET",
         params: {
           ...params,
@@ -13,11 +13,13 @@ export const userApi = baseApi.injectEndpoints({
       providesTags: ["user"],
     }),
     getSingleUser: builder.query({
-      query: ({ userId }) => ({
-        url: "dashboard/users-business-statistics",
+      query: ({ userId, page = 1, limit = 5 }) => ({
+        url: "/auth/find_by_admin_all_users",
         method: "GET",
         params: {
-          userId,
+          ...(userId && { userId }),
+          page,
+          limit,
         },
       }),
       providesTags: ["user"],
@@ -25,7 +27,7 @@ export const userApi = baseApi.injectEndpoints({
     updateUser: builder.mutation({
       query: (userId) => {
         return {
-          url: `dashboard/block-user?userId=${userId}`,
+          url: `/auth/block-user?userId=${userId}`,
           method: "PATCH",
         };
       },

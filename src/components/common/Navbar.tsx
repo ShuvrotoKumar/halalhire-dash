@@ -5,11 +5,20 @@ import { MessageSquare, Bell, User, Menu } from "lucide-react";
 import { useSidebar } from "../ui/sidebar";
 import Link from "next/link";
 import NotificationMenu from "./NotificationMenu";
+import { useGetAllNotificationQuery } from "@/redux/api/notificationApi";
+import { useGetAvatarQuery } from "@/redux/api/avatarApi";
 
 const Navbar = () => {
   const { toggleSidebar, state } = useSidebar();
   const sidebarOpen = state === "expanded";
   const [showNotifications, setShowNotifications] = useState(false);
+  const { data: notificationData, isLoading } = useGetAllNotificationQuery({});
+  const notifications = notificationData?.data?.data || [];
+  const unreadCount = notifications.filter((n: any) => !n.isRead).length;
+  
+  // Fetch user avatar
+  const { data: avatarData } = useGetAvatarQuery({});
+  const avatarUrl = avatarData?.data?.avatar;
 
   return (
     <>
@@ -65,9 +74,13 @@ const Navbar = () => {
                   className="h-5 w-5 text-gray-900 md:h-6 md:w-6 dark:text-white"
                   strokeWidth={2}
                 />
-                <div className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-[#C8A75B] md:top-2 md:right-2 md:h-4 md:w-4">
-                  <span className="text-xs font-normal text-white">.</span>
-                </div>
+                {unreadCount > 0 && (
+                  <div className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-[#C8A75B] md:top-2 md:right-2 md:h-4 md:w-4">
+                    <span className="text-xs font-normal text-white">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  </div>
+                )}
               </button>
               <NotificationMenu
                 open={showNotifications}
@@ -75,14 +88,21 @@ const Navbar = () => {
               />
             </div>
 
-            {/* Profile */}
-
+            {/* Profile Avatar */}
             <div className="flex h-[40px] w-[40px] flex-shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-gray-900 bg-transparent md:h-[52px] md:w-[52px] dark:border-white">
               <Link href="/profile">
-                <User
-                  className="h-5 w-5 text-gray-900 md:h-6 md:w-6 dark:text-white"
-                  strokeWidth={2}
-                />
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <User
+                    className="h-5 w-5 text-gray-900 md:h-6 md:w-6 dark:text-white"
+                    strokeWidth={2}
+                  />
+                )}
               </Link>
             </div>
           </div>

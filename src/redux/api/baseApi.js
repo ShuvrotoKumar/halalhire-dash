@@ -8,6 +8,12 @@ export const baseApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: getBaseUrl(),
     prepareHeaders: (headers, { getState }) => {
+      // Set CORS headers
+      headers.set("Access-Control-Allow-Origin", "*");
+      headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+      headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      headers.set("Content-Type", "application/json");
+      
       const token = getState().auth.token;
       console.log("🔍 Token from Redux state:", token);
       if (token) {
@@ -53,5 +59,8 @@ export const baseApi = createApi({
     "listings",
     "notification",
     "NDA",
+    "my avatar",
   ],
 });
+
+export { baseApi };

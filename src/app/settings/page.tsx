@@ -29,6 +29,21 @@ const settingsOptions = [
     title: "About Us",
     path: "/settings/about-us",
   },
+  {
+    id: "cookie",
+    title: "Cookie Policy",
+    path: "/settings/cookie",
+  },
+  {
+    id: "imprint",
+    title: "Imprint",
+    path: "/settings/imprint",
+  },
+  {
+    id: "accessibility",
+    title: "Accessibility",
+    path: "/settings/accessibility",
+  },
 ];
 
 export default function SettingsPage() {

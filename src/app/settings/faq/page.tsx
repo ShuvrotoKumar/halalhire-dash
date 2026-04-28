@@ -154,7 +154,11 @@ export default function FAQPage() {
           setSelectedFaq(null);
         }}
         onConfirm={handleEditFAQ}
-        faq={selectedFaq}
+        faq={selectedFaq ? {
+          id: selectedFaq._id,
+          question: selectedFaq.question,
+          answer: selectedFaq.answer
+        } : null}
       />
       <DeleteFAQModal
         open={deleteModalOpen}

@@ -10,6 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useGetAllUserQuery } from "@/redux/api/userApi";
 
 export const description = "User ratio over months";
 
@@ -46,21 +47,37 @@ const chartConfig = {
 export function UserRatio() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState<number>(currentYear);
-
+  const { data: userData, isLoading, error } = useGetAllUserQuery({ year });
+  
   const years = useMemo(() => {
     // show a small range: current year and 4 previous years
     return Array.from({ length: 5 }).map((_, idx) => currentYear - idx);
   }, [currentYear]);
 
-  const chartData = useMemo(() => sampleDataForYear(year), [year]);
+  // Transform API data to chart format
+  const chartData = useMemo(() => {
+    if (userData?.data?.monthlyStats) {
+      return userData.data.monthlyStats.map((stat: any) => ({
+        month: MONTHS[stat.month - 1],
+        desktop: stat.count,
+      }));
+    }
+    // Fallback to sample data if API data not available
+    return sampleDataForYear(year);
+  }, [userData, year]);
 
   return (
     <Card className="h-full dark:border-[#F4B057]">
       <CardHeader className="p-4 sm:p-6">
         <div className="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0">
           <div className="min-w-0 flex-1">
-            <CardTitle className="text-base sm:text-lg">User Ratio</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">{`January - December ${year}`}</CardDescription>
+            <CardTitle className="text-base sm:text-lg">User Growth</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              {isLoading ? "Loading..." : `January - December ${year}`}
+              {userData?.data?.yearlyGrowth && (
+                <span className="ml-2 text-green-600">(+{userData.data.yearlyGrowth}% growth)</span>
+              )}
+            </CardDescription>
           </div>
 
           <div className="w-full sm:w-auto">
@@ -83,28 +100,38 @@ export function UserRatio() {
         </div>
       </CardHeader>
       <CardContent className="h-full p-2 sm:p-4 md:p-6">
-        <ChartContainer config={chartConfig} className="aspect-auto h-full">
-          <BarChart
-            accessibilityLayer
-            data={chartData}
-            barCategoryGap="20%"
-            barGap={2}
-            margin={{ left: -20, right: 10, top: 10, bottom: 0 }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              tickMargin={8}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-              tick={{ fontSize: 12 }}
-              className="text-xs sm:text-sm"
-            />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-          </BarChart>
-        </ChartContainer>
+        {isLoading ? (
+          <div className="flex h-full items-center justify-center">
+            <div className="text-sm text-muted-foreground">Loading user data...</div>
+          </div>
+        ) : error ? (
+          <div className="flex h-full items-center justify-center">
+            <div className="text-sm text-destructive">Failed to load user data</div>
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig} className="aspect-auto h-full">
+            <BarChart
+              accessibilityLayer
+              data={chartData}
+              barCategoryGap="20%"
+              barGap={2}
+              margin={{ left: -20, right: 10, top: 10, bottom: 0 }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                tickMargin={8}
+                axisLine={false}
+                tickFormatter={(value) => value.slice(0, 3)}
+                tick={{ fontSize: 12 }}
+                className="text-xs sm:text-sm"
+              />
+              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+              <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+            </BarChart>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   );
