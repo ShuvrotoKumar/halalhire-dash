@@ -1,20 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import TiptapEditor from "@/components/ui/TiptapEditor";
+import { useCreatePrivacyMutation } from "@/redux/api/privacyApi";
 
 export default function PrivacyPolicyPage() {
   const router = useRouter();
+  const [createPrivacy, { isLoading }] = useCreatePrivacyMutation();
   const [content, setContent] = useState(
     "<p>Your privacy is important to us. This privacy policy explains how we collect, use, and protect your personal information.</p>",
   );
 
-  const handleSave = () => {
-    // Handle save logic
-    alert("Privacy Policy saved!");
+  const handleSave = async () => {
+    try {
+      const response = await createPrivacy({
+        requestData: {
+          PrivacyPolicy: content,
+        },
+      }).unwrap();
+      
+      alert("Privacy Policy saved successfully!");
+    } catch (err: any) {
+      console.error("Save Privacy Policy Error:", err);
+      const errorMessage = err?.data?.message || "Failed to save Privacy Policy. Please try again.";
+      alert(errorMessage);
+    }
   };
 
   return (
@@ -43,8 +56,16 @@ export default function PrivacyPolicyPage() {
         <Button
           onClick={handleSave}
           className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto"
+          disabled={isLoading}
         >
-          Save changes
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save changes"
+          )}
         </Button>
       </div>
     </div>

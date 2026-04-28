@@ -9,10 +9,10 @@ const privacyApi = baseApi.injectEndpoints({
       }),
       providesTags: ["privacy"],
     }),
-    updatePrivacy: builder.mutation({
+    createPrivacy: builder.mutation({
       query: ({ requestData }) => ({
-        url: "home/update-privacy-policy",
-        method: "PATCH",
+        url: "/setting/privacy_policys",
+        method: "POST",
         body: requestData,
       }),
       invalidatesTags: ["privacy"],
@@ -28,4 +28,4 @@ const privacyApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetPrivacyQuery, useUpdatePrivacyMutation, useCreateAboutUsMutation } = privacyApi;
+export const { useGetPrivacyQuery, useCreatePrivacyMutation, useCreateAboutUsMutation } = privacyApi;
