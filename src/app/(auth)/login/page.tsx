@@ -51,14 +51,20 @@ export default function LoginPage() {
       try {
         const response = await logIn({ email, password }).unwrap();
         
+        console.log("🔍 Full login response:", response);
+        
         // Adjust these based on actual API response structure
         const userData = response?.data?.user || response?.user;
         const accessToken = response?.data?.accessToken || response?.accessToken || response?.token;
+        
+        console.log("🔍 Extracted user:", userData);
+        console.log("🔍 Extracted token:", accessToken);
 
         if (accessToken) {
           dispatch(setUser({ user: userData, token: accessToken }));
           router.push("/");
         } else {
+          console.log("❌ No token found in response structure");
           setErrors({ ...errors, form: "Login successful but no token received." });
         }
       } catch (err: any) {

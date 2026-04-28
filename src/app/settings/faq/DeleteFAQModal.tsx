@@ -2,12 +2,14 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
+import { useDeleteFaqMutation } from "@/redux/api/faqApi";
 
 type DeleteFAQModalProps = {
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm?: () => void;
+  faqId?: string;
   faqQuestion: string;
 };
 
@@ -15,11 +17,25 @@ export default function DeleteFAQModal({
   open,
   onClose,
   onConfirm,
+  faqId,
   faqQuestion,
 }: DeleteFAQModalProps) {
-  const handleConfirm = () => {
-    onConfirm();
-    onClose();
+  const [deleteFaq, { isLoading }] = useDeleteFaqMutation();
+  const handleConfirm = async () => {
+    if (faqId) {
+      try {
+        await deleteFaq({ _id: faqId }).unwrap();
+        // Call onConfirm if provided (for parent component to refresh data)
+        if (onConfirm) {
+          onConfirm();
+        }
+        onClose();
+      } catch (err: any) {
+        console.error("Delete FAQ Error:", err);
+        const errorMessage = err?.data?.message || "Failed to delete FAQ. Please try again.";
+        alert(errorMessage);
+      }
+    }
   };
 
   return (
@@ -50,8 +66,16 @@ export default function DeleteFAQModal({
             type="button"
             onClick={handleConfirm}
             className="bg-destructive hover:bg-destructive/90 text-destructive-foreground flex-1"
+            disabled={isLoading || !faqId}
           >
-            Delete
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              "Delete"
+            )}
           </Button>
         </div>
       </DialogContent>

@@ -39,6 +39,18 @@ const authApi = baseApi.injectEndpoints({
 
       invalidatesTags: ["admin"],
     }),
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: "/user/change_password",
+        method: "PATCH",
+        body: data,
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      }),
+
+      invalidatesTags: ["admin"],
+    }),
   }),
 });
 
@@ -47,6 +59,7 @@ export const {
   useForgotPasswordMutation,
   useVerifyEmailMutation,
   useResetPasswordMutation,
+  useChangePasswordMutation,
 } = authApi;
 
 export default authApi;

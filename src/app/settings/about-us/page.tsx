@@ -1,20 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import TiptapEditor from "@/components/ui/TiptapEditor";
+import { useCreateAboutUsMutation } from "@/redux/api/privacyApi";
 
 export default function AboutUsPage() {
   const router = useRouter();
+  const [createAboutUs, { isLoading }] = useCreateAboutUsMutation();
   const [content, setContent] = useState(
     "<p>We are a dedicated team committed to providing the best service to our customers. Learn more about our mission and values.</p>",
   );
 
-  const handleSave = () => {
-    // Handle save logic
-    alert("About Us saved!");
+  const handleSave = async () => {
+    try {
+      const response = await createAboutUs({
+        requestData: {
+          aboutUs: content,
+        },
+      }).unwrap();
+      
+      alert("About Us saved successfully!");
+    } catch (err: any) {
+      console.error("Save About Us Error:", err);
+      const errorMessage = err?.data?.message || "Failed to save About Us. Please try again.";
+      alert(errorMessage);
+    }
   };
 
   return (
@@ -39,8 +52,16 @@ export default function AboutUsPage() {
         <Button
           onClick={handleSave}
           className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto"
+          disabled={isLoading}
         >
-          Save changes
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save changes"
+          )}
         </Button>
       </div>
     </div>

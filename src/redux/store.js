@@ -7,6 +7,13 @@ const persistConfig = {
   key: "BAZARYA-app",
   storage,
   blacklist: ["baseApi"], // Prevent persisting API cache
+  migrate: (state) => {
+    // Remove old keys that don't exist in current store
+    if (state && state.registration) {
+      delete state.registration;
+    }
+    return Promise.resolve(state);
+  },
 };
 
 const rootReducer = combineReducers({

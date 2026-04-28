@@ -4,7 +4,7 @@ const faqApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllFaq: builder.query({
       query: (params) => ({
-        url: "faq/get-all-faq",
+        url: "/faq/find_by_all_faq",
         method: "GET",
         params,
       }),
@@ -12,32 +12,31 @@ const faqApi = baseApi.injectEndpoints({
     }),
     deleteFaq: builder.mutation({
       query: ({ _id }) => ({
-        url: `faq/delete-faq`,
+        url: `/faq/delete_faq/${_id}`,
         method: "DELETE",
-        params: { faqId: _id },
       }),
       invalidatesTags: ["faq"],
     }),
     createFaq: builder.mutation({
       query: (data) => ({
-        url: "faq/create-faq",
+        url: "/faq/create_faq",
         method: "POST",
         body: data,
       }),
       invalidatesTags: ["faq"],
     }),
-    updateFaq: builder.mutation({
-      query: ({ _id, data }) => {
-        // console.log("Updating FAQ:", { _id, data });
-        return {
-          url: `faq/update-faq`,
-          method: "PATCH",
-          params: { faqId: _id },
-          body: data,
-        };
-      },
-      invalidatesTags: ["faq"],
-    }),
+    // updateFaq: builder.mutation({
+    //   query: ({ _id, data }) => {
+    //     // console.log("Updating FAQ:", { _id, data });
+    //     return {
+    //       url: `faq/update-faq`,
+    //       method: "PATCH",
+    //       params: { faqId: _id },
+    //       body: data,
+    //     };
+    //   },
+    //   invalidatesTags: ["faq"],
+    // }),
   }),
 });
 
@@ -45,7 +44,7 @@ export const {
   useGetAllFaqQuery,
   useCreateFaqMutation,
   useDeleteFaqMutation,
-  useUpdateFaqMutation,
+  // useUpdateFaqMutation,
 } = faqApi;
 
 export default faqApi;

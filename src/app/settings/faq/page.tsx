@@ -1,65 +1,51 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import CreateFAQModal from "./CreateFAQModal";
 import EditFAQModal from "./EditFAQModal";
 import DeleteFAQModal from "./DeleteFAQModal";
+import { useGetAllFaqQuery } from "@/redux/api/faqApi";
 
 type FAQ = {
-  id: string;
+  _id: string;
+  userId: string;
   question: string;
   answer: string;
+  isDelete: boolean;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export default function FAQPage() {
   const router = useRouter();
-  const [faqs, setFaqs] = useState<FAQ[]>([
-    {
-      id: "faq-1",
-      question: "How do I reset my password?",
-      answer:
-        "<p>You can reset your password by going to Settings &gt; Change Password. Enter your current password, then choose a new password and confirm it.</p>",
-    },
-    {
-      id: "faq-2",
-      question: "How do I update my profile information?",
-      answer:
-        "<p>Navigate to your Profile page from the sidebar menu. Click on the edit icon or 'Edit Profile' button to modify your personal information.</p>",
-    },
-    {
-      id: "faq-3",
-      question: "What payment methods do you accept?",
-      answer:
-        "<p>We accept various payment methods including credit cards (Visa, MasterCard, American Express), debit cards, PayPal, and bank transfers.</p>",
-    },
-  ]);
-
+  const { data: faqData, isLoading, error, refetch } = useGetAllFaqQuery({});
+  const faqs = faqData?.data?.data || [];
+  
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedFaq, setSelectedFaq] = useState<FAQ | null>(null);
 
-  const handleCreateFAQ = (faq: { question: string; answer: string }) => {
-    const newFaq: FAQ = {
-      id: `faq-${Date.now()}`,
-      question: faq.question,
-      answer: faq.answer,
-    };
-    setFaqs([...faqs, newFaq]);
+  const handleCreateFAQ = () => {
+    // FAQ is created via API in CreateFAQModal
+    // Refresh the list after creation
+    refetch();
   };
 
-  const handleEditFAQ = (updatedFaq: { id: string; question: string; answer: string }) => {
-    setFaqs(faqs.map((faq) => (faq.id === updatedFaq.id ? updatedFaq : faq)));
+  const handleEditFAQ = () => {
+    // FAQ is updated via API in EditFAQModal
+    // Refresh the list after update
+    refetch();
   };
 
   const handleDeleteFAQ = () => {
-    if (selectedFaq) {
-      setFaqs(faqs.filter((faq) => faq.id !== selectedFaq.id));
-      setSelectedFaq(null);
-    }
+    // FAQ is deleted via API in DeleteFAQModal
+    // Refresh the list after deletion
+    refetch();
+    setSelectedFaq(null);
   };
 
   const openEditModal = (faq: FAQ) => {
@@ -96,16 +82,28 @@ export default function FAQPage() {
 
       {/* FAQ List */}
       <div className="bg-card p-6">
-        {faqs.length === 0 ? (
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="text-destructive py-12 text-center">
+            <p className="mb-2 text-lg font-medium">Error loading FAQs</p>
+            <p className="text-sm mb-4">Failed to load FAQ data. Please try again.</p>
+            <Button onClick={() => refetch()} variant="outline">
+              Retry
+            </Button>
+          </div>
+        ) : faqs.length === 0 ? (
           <div className="text-muted-foreground py-12 text-center">
             <p className="mb-2 text-lg font-medium">No FAQs yet</p>
             <p className="text-sm">Click "Add FAQ" to create your first FAQ item.</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {faqs.map((faq) => (
+            {faqs.map((faq: FAQ) => (
               <div
-                key={faq.id}
+                key={faq._id}
                 className="border-border hover:bg-muted/30 rounded-lg border p-4 transition-colors"
               >
                 <div className="flex items-start justify-between gap-4">
@@ -147,7 +145,7 @@ export default function FAQPage() {
       <CreateFAQModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
-        onConfirm={handleCreateFAQ}
+        onConfirm={() => handleCreateFAQ()}
       />
       <EditFAQModal
         open={editModalOpen}
@@ -165,6 +163,7 @@ export default function FAQPage() {
           setSelectedFaq(null);
         }}
         onConfirm={handleDeleteFAQ}
+        faqId={selectedFaq?._id}
         faqQuestion={selectedFaq?.question || ""}
       />
     </div>

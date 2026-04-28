@@ -13,7 +13,8 @@ export const authSlice = createSlice({
       const { user, token } = action.payload;
       state.user = user;
       state.token = token;
-      // console.log("token", token);
+      console.log("🔐 Storing token in Redux:", token);
+      console.log("🔐 Storing user in Redux:", user);
     },
     logout: (state) => {
       state.user = null;

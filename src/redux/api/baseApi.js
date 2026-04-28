@@ -9,8 +9,27 @@ export const baseApi = createApi({
     baseUrl: getBaseUrl(),
     prepareHeaders: (headers, { getState }) => {
       const token = getState().auth.token;
+      console.log("🔍 Token from Redux state:", token);
       if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
+        // Try without Bearer prefix first
+        headers.set("Authorization", token);
+        console.log("✅ Authorization header set (without Bearer):", token);
+      } else {
+        console.log("❌ No token found in Redux state");
+        // Check localStorage as fallback
+        const localStorageToken = localStorage.getItem("BAZARYA-app");
+        console.log("🔍 localStorage token:", localStorageToken);
+        if (localStorageToken) {
+          try {
+            const parsed = JSON.parse(localStorageToken);
+            if (parsed.auth && parsed.auth.token) {
+              console.log("✅ Found token in localStorage, setting header");
+              headers.set("Authorization", parsed.auth.token);
+            }
+          } catch (e) {
+            console.log("❌ Failed to parse localStorage");
+          }
+        }
       }
       return headers;
     },

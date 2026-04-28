@@ -5,14 +5,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import TiptapEditor from "@/components/ui/TiptapEditor";
+import { useCreateFaqMutation } from "@/redux/api/faqApi";
 
 type CreateFAQModalProps = {
   open: boolean;
   onClose: () => void;
-  onConfirm: (faq: { question: string; answer: string }) => void;
+  onConfirm?: (faq: { question: string; answer: string }) => void;
 };
 
 export default function CreateFAQModal({ open, onClose, onConfirm }: CreateFAQModalProps) {
+  const [createFaq, { isLoading }] = useCreateFaqMutation();
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [errors, setErrors] = useState<{
@@ -35,15 +37,30 @@ export default function CreateFAQModal({ open, onClose, onConfirm }: CreateFAQMo
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
-      onConfirm({
-        question,
-        answer,
-      });
-      handleClose();
+      try {
+        const response = await createFaq({
+          question,
+          answer,
+        }).unwrap();
+        
+        // Call onConfirm if provided
+        if (onConfirm) {
+          onConfirm({
+            question,
+            answer,
+          });
+        }
+        
+        handleClose();
+      } catch (err: any) {
+        console.error("Create FAQ Error:", err);
+        const errorMessage = err?.data?.message || "Failed to create FAQ. Please try again.";
+        alert(errorMessage);
+      }
     }
   };
 
@@ -103,8 +120,13 @@ export default function CreateFAQModal({ open, onClose, onConfirm }: CreateFAQMo
             <Button
               type="submit"
               className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1"
+              disabled={isLoading}
             >
-              Create FAQ
+              {isLoading ? (
+                "Creating..."
+              ) : (
+                "Create FAQ"
+              )}
             </Button>
           </div>
         </form>

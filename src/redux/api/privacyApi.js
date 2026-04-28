@@ -17,7 +17,15 @@ const privacyApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["privacy"],
     }),
+    createAboutUs: builder.mutation({
+      query: ({ requestData }) => ({
+        url: "/setting/about",
+        method: "POST",
+        body: requestData,
+      }),
+      invalidatesTags: ["privacy"],
+    }),
   }),
 });
 
-export const { useGetPrivacyQuery, useUpdatePrivacyMutation } = privacyApi;
+export const { useGetPrivacyQuery, useUpdatePrivacyMutation, useCreateAboutUsMutation } = privacyApi;
