@@ -248,7 +248,7 @@ export default function UsersPage() {
   // Filter users by role and search query
   const filteredUsers = allUsers.filter((user: User) => {
     const matchesRole = activeTab === "users" 
-      ? user.role === "user" || user.role === "admin" || user.role === "superAdmin"
+      ? user.role === "user"
       : user.role === "company";
     
     const matchesSearch = query === "" || 
