@@ -6,10 +6,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Lock, CheckCircle2, X } from "lucide-react";
+import { Eye, EyeOff, Lock, CheckCircle2, X, Loader2 } from "lucide-react";
+import { useResetPasswordMutation } from "@/redux/api/authApi";
+import { useEffect } from "react";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -17,7 +20,16 @@ export default function ResetPasswordPage() {
   const [errors, setErrors] = useState<{
     password?: string;
     confirmPassword?: string;
+    form?: string;
   }>({});
+
+  // Check for reset token on mount
+  useEffect(() => {
+    const token = localStorage.getItem("resetToken");
+    if (!token) {
+      router.push("/forgot-password");
+    }
+  }, [router]);
 
   // Password strength checker
   const getPasswordStrength = (pwd: string) => {
@@ -51,13 +63,32 @@ export default function ResetPasswordPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // Add your reset password logic here
-      console.log("Password reset successful");
-      // Example: router.push('/login');
+      try {
+        const token = localStorage.getItem("resetToken");
+        const response = await resetPassword({ 
+          password, 
+          token // Passing token in body as requested, though header is also used in authApi
+        }).unwrap();
+        
+        console.log("Reset Password Response:", response);
+        
+        // Clear reset token
+        localStorage.removeItem("resetToken");
+        
+        // Success notification could be added here
+        alert("Password reset successfully! Please login with your new password.");
+        
+        // Redirect to login page
+        router.push("/login");
+      } catch (err: any) {
+        console.error("Reset Password Error:", err);
+        const errorMessage = err?.data?.message || "Failed to reset password. Please try again.";
+        setErrors({ ...errors, form: errorMessage });
+      }
     }
   };
 
@@ -105,7 +136,7 @@ export default function ResetPasswordPage() {
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
-                    if (errors.password) setErrors({ ...errors, password: undefined });
+                    if (errors.password || errors.form) setErrors({ ...errors, password: undefined, form: undefined });
                   }}
                   className={`pl-10 pr-10 ${errors.password ? "border-destructive" : ""}`}
                 />
@@ -157,8 +188,8 @@ export default function ResetPasswordPage() {
                   value={confirmPassword}
                   onChange={(e) => {
                     setConfirmPassword(e.target.value);
-                    if (errors.confirmPassword)
-                      setErrors({ ...errors, confirmPassword: undefined });
+                    if (errors.confirmPassword || errors.form)
+                      setErrors({ ...errors, confirmPassword: undefined, form: undefined });
                   }}
                   className={`pl-10 pr-10 ${errors.confirmPassword ? "border-destructive" : ""}`}
                 />
@@ -196,18 +227,33 @@ export default function ResetPasswordPage() {
               )}
             </div>
 
+            {/* Form Level Error */}
+            {errors.form && (
+              <div className="bg-destructive/10 border-destructive/20 text-destructive rounded-lg border p-3 text-center text-sm">
+                {errors.form}
+              </div>
+            )}
+
             {/* Submit Button */}
             <Button
               type="submit"
               className="bg-primary hover:bg-primary/90 text-primary-foreground w-full text-base font-semibold"
               size="lg"
+              disabled={isLoading}
             >
-              Reset Password
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Resetting Password...
+                </>
+              ) : (
+                "Reset Password"
+              )}
             </Button>
 
             {/* Back to Login */}
             <Link href="/login" className="block">
-              <Button variant="ghost" className="w-full" size="lg">
+              <Button variant="ghost" className="w-full" size="lg" type="button">
                 Back to Login
               </Button>
             </Link>
