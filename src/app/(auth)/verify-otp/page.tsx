@@ -6,12 +6,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, ArrowLeft, Loader2 } from "lucide-react";
-import { useVerifyEmailMutation } from "@/redux/api/authApi";
+import { useVerifyEmailMutation, useLazyResendOtpQuery } from "@/redux/api/authApi";
 
 function VerifyOtpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
+  const [verifyEmail, { isLoading: isVerifying }] = useVerifyEmailMutation();
+  const [triggerResendOtp, { isFetching: isResending }] = useLazyResendOtpQuery();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [errors, setErrors] = useState<{
@@ -89,10 +90,19 @@ function VerifyOtpContent() {
     }
   };
 
-  const handleResendOtp = () => {
-    console.log("Resend OTP to:", email);
-    setOtp(["", "", "", "", "", ""]);
-    // Add your resend OTP logic here
+  const handleResendOtp = async () => {
+    if (!email) return;
+
+    try {
+      await triggerResendOtp(email).unwrap();
+      alert(`OTP has been resent to ${email}`);
+      setOtp(["", "", "", "", "", ""]);
+      setErrors({});
+    } catch (err: any) {
+      console.error("Resend OTP Error:", err);
+      const errorMessage = err?.data?.message || "Failed to resend OTP. Please try again.";
+      alert(errorMessage);
+    }
   };
 
   return (
@@ -166,9 +176,10 @@ function VerifyOtpContent() {
               <button
                 type="button"
                 onClick={handleResendOtp}
-                className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+                disabled={isResending}
+                className="text-primary hover:text-primary/80 disabled:text-muted-foreground text-sm font-medium transition-colors"
               >
-                Didn't receive OTP? Resend
+                {isResending ? "Resending..." : "Didn't receive OTP? Resend"}
               </button>
             </div>
 
@@ -177,9 +188,9 @@ function VerifyOtpContent() {
               type="submit"
               className="bg-primary hover:bg-primary/90 text-primary-foreground w-full text-base font-semibold"
               size="lg"
-              disabled={isLoading}
+              disabled={isVerifying}
             >
-              {isLoading ? (
+              {isVerifying ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Verifying...
