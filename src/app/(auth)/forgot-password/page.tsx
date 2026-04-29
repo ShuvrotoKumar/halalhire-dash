@@ -6,13 +6,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, ArrowLeft } from "lucide-react";
+import { Mail, ArrowLeft, Loader2 } from "lucide-react";
+import { useForgotPasswordMutation } from "@/redux/api/authApi";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<{
     email?: string;
+    form?: string;
   }>({});
 
   const validateEmail = () => {
@@ -28,14 +31,20 @@ export default function ForgotPasswordPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSendOtp = (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateEmail()) {
-      // Add your send OTP logic here
-      console.log("Send OTP to:", email);
-      // Redirect to OTP verification page
-      router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+      try {
+        const response = await forgotPassword({ email }).unwrap();
+        console.log("Forgot Password Response:", response);
+        // Redirect to OTP verification page on success
+        router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+      } catch (err: any) {
+        console.error("Forgot Password Error:", err);
+        const errorMessage = err?.data?.message || "Something went wrong. Please try again.";
+        setErrors({ ...errors, form: errorMessage });
+      }
     }
   };
 
@@ -83,7 +92,7 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    if (errors.email) setErrors({ ...errors, email: undefined });
+                    if (errors.email || errors.form) setErrors({ ...errors, email: undefined, form: undefined });
                   }}
                   className={`pl-10 ${errors.email ? "border-destructive" : ""}`}
                 />
@@ -91,18 +100,33 @@ export default function ForgotPasswordPage() {
               {errors.email && <p className="text-destructive text-xs">{errors.email}</p>}
             </div>
 
+            {/* Form Level Error */}
+            {errors.form && (
+              <div className="bg-destructive/10 border-destructive/20 text-destructive rounded-lg border p-3 text-center text-sm">
+                {errors.form}
+              </div>
+            )}
+
             {/* Submit Button */}
             <Button
               type="submit"
               className="bg-primary hover:bg-primary/90 text-primary-foreground w-full text-base font-semibold"
               size="lg"
+              disabled={isLoading}
             >
-              Send OTP
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Sending OTP...
+                </>
+              ) : (
+                "Send OTP"
+              )}
             </Button>
 
             {/* Back to Login */}
             <Link href="/login" className="block">
-              <Button variant="ghost" className="w-full" size="lg">
+              <Button variant="ghost" className="w-full" size="lg" type="button">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Login
               </Button>
@@ -113,3 +137,4 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
+

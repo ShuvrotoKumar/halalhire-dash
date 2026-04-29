@@ -5,15 +5,18 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft } from "lucide-react";
+import { Mail, ArrowLeft, Loader2 } from "lucide-react";
+import { useVerifyEmailMutation } from "@/redux/api/authApi";
 
 function VerifyOtpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [errors, setErrors] = useState<{
     otp?: string;
+    form?: string;
   }>({});
 
   useEffect(() => {
@@ -38,14 +41,27 @@ function VerifyOtpContent() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateOtp()) {
-      // Add your verify OTP logic here
-      console.log("Verify OTP:", otp.join(""));
-      // Redirect to reset password page
-      router.push("/reset-password");
+      try {
+        const response = await verifyEmail({ verificationCode: otp.join("") }).unwrap();
+        console.log("Verify OTP Response:", response);
+        
+        // Usually, the response contains a token to be used in the next step
+        const token = response?.data?.token || response?.token;
+        if (token) {
+          localStorage.setItem("resetToken", token);
+        }
+        
+        // Redirect to reset password page
+        router.push("/reset-password");
+      } catch (err: any) {
+        console.error("Verify OTP Error:", err);
+        const errorMessage = err?.data?.message || "Invalid OTP. Please try again.";
+        setErrors({ ...errors, form: errorMessage });
+      }
     }
   };
 
@@ -63,7 +79,7 @@ function VerifyOtpContent() {
     }
 
     // Clear error when user types
-    if (errors.otp) setErrors({ ...errors, otp: undefined });
+    if (errors.otp || errors.form) setErrors({ ...errors, otp: undefined, form: undefined });
   };
 
   const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -138,6 +154,13 @@ function VerifyOtpContent() {
               {errors.otp && <p className="text-destructive text-center text-xs">{errors.otp}</p>}
             </div>
 
+            {/* Form Level Error */}
+            {errors.form && (
+              <div className="bg-destructive/10 border-destructive/20 text-destructive rounded-lg border p-3 text-center text-sm">
+                {errors.form}
+              </div>
+            )}
+
             {/* Resend OTP */}
             <div className="text-center">
               <button
@@ -154,8 +177,16 @@ function VerifyOtpContent() {
               type="submit"
               className="bg-primary hover:bg-primary/90 text-primary-foreground w-full text-base font-semibold"
               size="lg"
+              disabled={isLoading}
             >
-              Verify OTP
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                "Verify OTP"
+              )}
             </Button>
 
             {/* Back Button */}
