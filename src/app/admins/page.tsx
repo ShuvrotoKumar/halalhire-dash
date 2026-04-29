@@ -400,7 +400,7 @@ export default function AdminsPage() {
   }, [usersData, altUsersData, isLoading]);
   
   // Filter users to show only admin roles
-  const admins = React.useMemo(() => {
+  const admins: Admin[] = React.useMemo(() => {
     // Use the working data source - prioritize getSingleUser since that's where the data is
     const workingData = altUsersData || usersData;
     
@@ -495,10 +495,11 @@ export default function AdminsPage() {
   }, [usersData, altUsersData]);
 
   const filtered = admins.filter(
-    (a) =>
-      a.name.toLowerCase().includes(query.toLowerCase()) ||
-      a.email.toLowerCase().includes(query.toLowerCase()),
+    (a: Admin) =>
+      (a.name?.toLowerCase() || "").includes(query.toLowerCase()) ||
+      (a.email?.toLowerCase() || "").includes(query.toLowerCase()),
   );
+
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -512,21 +513,21 @@ export default function AdminsPage() {
   function handleBlockConfirm() {
     if (blockAdmin) {
       setBlockedAdmins((prev) => [...prev, blockAdmin]);
-      setAdmins((prev) => prev.filter((a) => a.id !== blockAdmin.id));
+      // setAdmins((prev) => prev.filter((a) => a.id !== blockAdmin.id));
       setBlockAdmin(null);
     }
   }
 
   function handleUnblock(id: string) {
-    const admin = blockedAdmins.find((a) => a.id === id);
+    const admin = blockedAdmins.find((a) => a._id === id); // Changed id to _id
     if (admin) {
-      setAdmins((prev) => [...prev, admin]);
-      setBlockedAdmins((prev) => prev.filter((a) => a.id !== id));
+      // setAdmins((prev) => [...prev, admin]);
+      setBlockedAdmins((prev) => prev.filter((a) => a._id !== id)); // Changed id to _id
     }
   }
 
   function handleDelete(id: string) {
-    setBlockedAdmins((prev) => prev.filter((a) => a.id !== id));
+    setBlockedAdmins((prev) => prev.filter((a) => a._id !== id));
   }
 
   function handleCreateAdmin(newAdmin: {
@@ -536,15 +537,15 @@ export default function AdminsPage() {
     avatar?: string;
   }) {
     const admin: Admin = {
-      id: `${admins.length + blockedAdmins.length + 1}`,
+      _id: `${admins.length + blockedAdmins.length + 1}`, // Changed id to _id
       name: newAdmin.name,
       email: newAdmin.email,
       role: "Admin", // Default role for new admins
-      phone: "000-000-0000",
-      joinedAt: new Date().toISOString().split("T")[0],
-      avatar: newAdmin.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${newAdmin.name}`,
+      phoneNumber: "000-000-0000", // Changed phone to phoneNumber
+      createdAt: new Date().toISOString(), // Changed joinedAt to createdAt
+      photo: newAdmin.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${newAdmin.name}`, // Changed avatar to photo
     };
-    setAdmins((prev) => [admin, ...prev]);
+    // setAdmins((prev) => [admin, ...prev]);
   }
 
   function handleUpdateAdmin(updatedAdmin: {
@@ -554,9 +555,11 @@ export default function AdminsPage() {
     avatar?: string;
   }) {
     if (editingAdmin) {
+      /*
       setAdmins((prev) =>
-        prev.map((a) => (a.id === editingAdmin.id ? { ...a, ...updatedAdmin } : a)),
+        prev.map((a) => (a._id === editingAdmin._id ? { ...a, ...updatedAdmin } : a)),
       );
+      */
       setEditingAdmin(null);
     }
   }
@@ -673,7 +676,14 @@ export default function AdminsPage() {
       <UserDetailsModal
         open={!!selectedAdmin}
         onClose={() => setSelectedAdmin(null)}
-        user={selectedAdmin}
+        user={selectedAdmin ? {
+          id: selectedAdmin._id,
+          name: selectedAdmin.name || 'Unknown',
+          email: selectedAdmin.email,
+          phone: selectedAdmin.phoneNumber || 'N/A',
+          avatar: selectedAdmin.photo || '',
+          joinedAt: selectedAdmin.createdAt
+        } : null}
         onBlock={() => {
           if (selectedAdmin) {
             setBlockAdmin(selectedAdmin);
@@ -686,7 +696,13 @@ export default function AdminsPage() {
       <BlockUserModal
         open={!!blockAdmin}
         onClose={() => setBlockAdmin(null)}
-        user={blockAdmin}
+        user={blockAdmin ? {
+          id: blockAdmin._id,
+          name: blockAdmin.name || 'Unknown',
+          email: blockAdmin.email,
+          avatar: blockAdmin.photo || '',
+          status: blockAdmin.status
+        } : null}
         onConfirm={handleBlockConfirm}
       />
 
@@ -694,7 +710,14 @@ export default function AdminsPage() {
       <BlockedUsersModal
         open={showBlockedAdmins}
         onClose={() => setShowBlockedAdmins(false)}
-        blockedUsers={blockedAdmins}
+        blockedUsers={blockedAdmins.map(admin => ({
+          id: admin._id,
+          name: admin.name || 'Unknown',
+          email: admin.email,
+          phone: admin.phoneNumber || 'N/A',
+          joinedAt: admin.createdAt || '',
+          avatar: admin.photo || ''
+        }))}
         onUnblock={handleUnblock}
         onDelete={handleDelete}
       />
@@ -711,7 +734,13 @@ export default function AdminsPage() {
         open={!!editingAdmin}
         onClose={() => setEditingAdmin(null)}
         onConfirm={handleUpdateAdmin}
-        admin={editingAdmin}
+        admin={editingAdmin ? {
+          _id: editingAdmin._id,
+          name: editingAdmin.name || 'Unknown',
+          email: editingAdmin.email,
+          role: editingAdmin.role,
+          avatar: editingAdmin.photo || ''
+        } : null}
       />
     </div>
   );
